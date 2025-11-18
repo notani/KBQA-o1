@@ -407,7 +407,6 @@ def merge_all_data_for_logical_form_generation(dataset, split):
             # Skip if query results don't match expected answers
             if set(query_results) != set(answer):
                 print(sexpr)
-                breakpoint()
                 continue
         except KeyboardInterrupt:
             break
@@ -436,7 +435,6 @@ def merge_all_data_for_logical_form_generation(dataset, split):
         if reconstructed_sexpr != sexpr:
             # Skip if reconstruction doesn't match original
             print(sexpr)
-            breakpoint()
             continue
 
         # Build processed example with all required fields
@@ -445,7 +443,7 @@ def merge_all_data_for_logical_form_generation(dataset, split):
         processed_example["answer"] = answer
         processed_example["sparql"] = sparql
         processed_example["sexpr"] = sexpr
-        processed_example["func_list"] = function_calls
+        processed_example["function_list"] = function_calls
 
         # Add difficulty level for GrailQA test set
         if dataset == "GrailQA" and split == "test":

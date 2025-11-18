@@ -682,30 +682,30 @@ def augment_with_s_expr_grailqa(split, check_execute_accuracy=False):
                     pbar.set_postfix(SExprGenRate=srate, ExecuteRate=crate)
                 else:
                     pbar.set_postfix(SExprGenRate=srate)
-            # final summary (use tqdm.write so it doesn't interfere with the bar)
+        # final summary (use tqdm.write so it doesn't interfere with the bar)
+        if total_num:
+            srate_pct = hit_num / total_num * 100
+            srate = f"{hit_num}/{total_num} ({srate_pct:.2f}%)"
+        else:
+            srate = "0/0 (0.00%)"
+
+        tqdm.write(
+            f"[{split}] S-Expression generation: {srate} — processed: {total_num}, dataset size: {len(dataset)}"
+        )
+
+        if check_execute_accuracy:
             if total_num:
-                srate_pct = hit_num / total_num * 100
-                srate = f"{hit_num}/{total_num} ({srate_pct:.2f}%)"
+                crate_pct = execute_hit_num / total_num * 100
+                crate = f"{execute_hit_num}/{total_num} ({crate_pct:.2f}%)"
             else:
-                srate = "0/0 (0.00%)"
-
+                crate = "0/0 (0.00%)"
             tqdm.write(
-                f"[{split}] S-Expression generation: {srate} — processed: {total_num}, dataset size: {len(dataset)}"
+                f"[{split}] Execute-right (accuracy) : {crate} — processed: {total_num}, dataset size: {len(dataset)}"
             )
-
-            if check_execute_accuracy:
-                if total_num:
-                    crate_pct = execute_hit_num / total_num * 100
-                    crate = f"{execute_hit_num}/{total_num} ({crate_pct:.2f}%)"
-                else:
-                    crate = "0/0 (0.00%)"
-                tqdm.write(
-                    f"[{split}] Execute-right (accuracy) : {crate} — processed: {total_num}, dataset size: {len(dataset)}"
-                )
-            else:
-                tqdm.write(
-                    f"[{split}] Execute-right (accuracy) : N/A (check_execute_accuracy=False) — processed: {total_num}, dataset size: {len(dataset)}"
-                )
+        else:
+            tqdm.write(
+                f"[{split}] Execute-right (accuracy) : N/A (check_execute_accuracy=False) — processed: {total_num}, dataset size: {len(dataset)}"
+            )
     elif split == "test_public":
         dataset = load_json(f"dataset/GrailQA/origin/grailqa_v1.0_test_public.json")
     return dataset
