@@ -680,7 +680,7 @@ def augment_with_s_expr_grailqa(split, check_execute_accuracy=False):
                     pbar.set_postfix(SExprGenRate=srate, ExecuteRate=crate)
                 else:
                     pbar.set_postfix(SExprGenRate=srate)
-        # final summary (use tqdm.write so it doesn't interfere with the bar)
+        # final summary
         if total_num:
             srate_pct = hit_num / total_num * 100
             srate = f"{hit_num}/{total_num} ({srate_pct:.2f}%)"
