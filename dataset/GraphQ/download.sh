@@ -1,0 +1,2 @@
+wget https://raw.githubusercontent.com/dki-lab/GrailQA/refs/heads/main/data/graphquestions_v1_fb15_test_091420.json -O origin/graphquestions_v1_fb15_test_091420.json
+wget https://raw.githubusercontent.com/dki-lab/GrailQA/refs/heads/main/data/graphquestions_v1_fb15_training_091420.json -O origin/graphquestions_v1_fb15_training_091420.json
