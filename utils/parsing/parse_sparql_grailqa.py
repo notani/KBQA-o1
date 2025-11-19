@@ -1,6 +1,6 @@
 import re
 
-from utils.components.utils import *
+from utils.components.utils import load_json
 from utils.executor.sparql_executor import execute_query_with_odbc
 from utils.executor.logic_form_util_grailqa import lisp_to_sparql
 from tqdm import tqdm
@@ -29,9 +29,9 @@ class Parser:
         prefix_stmts = []
         line_num = 0
         while True:
-            l = lines[line_num]
-            if l.startswith("PREFIX"):
-                prefix_stmts.append(l)
+            L = lines[line_num]
+            if L.startswith("PREFIX"):
+                prefix_stmts.append(L)
             else:
                 break
             line_num = line_num + 1
@@ -69,7 +69,7 @@ class Parser:
             predefined_filter1 = body_lines[1]
 
             # filter_0_line validation
-            filter_0_valid = predefined_filter0 == f"FILTER (?x != ?c)"
+            filter_0_valid = predefined_filter0 == "FILTER (?x != ?c)"
             if not filter_0_valid:
                 for mid in mid_list:
                     filter_0_valid = filter_0_valid or (
@@ -227,17 +227,17 @@ class Parser:
             _tmp_body_lines = lines[1:-3]
 
             hit = False
-            for l in _tmp_body_lines:
-                if compare_var in l:
+            for L in _tmp_body_lines:
+                if compare_var in L:
                     # self.parse_assert(l.endswith('?sk0 .') and not hit)
                     self.parse_assert(
-                        l.endswith(compare_var + " .") and not hit
+                        L.endswith(compare_var + " .") and not hit
                     )  # appear only once
                     hit = True
-                    arg_var, arg_r = l.split(" ")[0], l.split(" ")[1]
+                    arg_var, arg_r = L.split(" ")[0], L.split(" ")[1]
                     arg_r = arg_r[3:]  # rm ns:
                 else:
-                    body_lines.append(l)
+                    body_lines.append(L)
 
             superlative_cond = ["SUPERLATIVE", direction, arg_var, arg_r]
             spec_condition.append(superlative_cond)
@@ -286,7 +286,7 @@ class Parser:
             #     range_relation.split('.')[:2]) + '.time_macro'
             range_relation = range_relation[3:]  # rm ns:
             range_start_time = (
-                re.findall(f'".*"\^\^', range_lines[2])[0].split("^^")[0].strip('"')
+                re.findall(r'".*"\^\^', range_lines[2])[0].split("^^")[0].strip('"')
             )
             if range_start_time == "2015-08-10":
                 range_start_time = "NOW"
@@ -388,13 +388,11 @@ class Parser:
         @param parsed_dict: dict for variables already parsed
         """
         if triplet[0] == tgt_var:
-            this = triplet[0]
             other = triplet[-1]
             if other in parsed_dict:
                 other = "(" + parsed_dict[other] + ")"
             return "JOIN {} {}".format(triplet[1], other)
         elif triplet[-1] == tgt_var:
-            this = triplet[-1]
             other = triplet[0]
             if other in parsed_dict:
                 other = "(" + parsed_dict[other] + ")"
@@ -628,9 +626,9 @@ def augment_with_s_expr_grailqa(split, check_execute_accuracy=False):
     """augment original grailqa datasets with s-expression"""
     if split == "train" or split == "test":
         if split == "train":
-            dataset = load_json(f"dataset/GrailQA/origin/grailqa_v1.0_train.json")
+            dataset = load_json("dataset/GrailQA/origin/grailqa_v1.0_train.json")
         elif split == "test":
-            dataset = load_json(f"dataset/GrailQA/origin/grailqa_v1.0_dev.json")
+            dataset = load_json("dataset/GrailQA/origin/grailqa_v1.0_dev.json")
         total_num = 0
         hit_num = 0
         execute_hit_num = 0
@@ -647,7 +645,7 @@ def augment_with_s_expr_grailqa(split, check_execute_accuracy=False):
                 try:
                     execute_ans = [
                         s.replace("http://rdf.freebase.com/ns/", "")
-                        if type(s) == str
+                        if isinstance(s, str)
                         else str(s)
                         for s in execute_query_with_odbc(
                             lisp_to_sparql(data["s_expression"])
@@ -707,7 +705,7 @@ def augment_with_s_expr_grailqa(split, check_execute_accuracy=False):
                 f"[{split}] Execute-right (accuracy) : N/A (check_execute_accuracy=False) — processed: {total_num}, dataset size: {len(dataset)}"
             )
     elif split == "test_public":
-        dataset = load_json(f"dataset/GrailQA/origin/grailqa_v1.0_test_public.json")
+        dataset = load_json("dataset/GrailQA/origin/grailqa_v1.0_test_public.json")
     return dataset
 
 
